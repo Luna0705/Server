@@ -4,7 +4,7 @@ const port = process.env.PORT || 8080;
 const server = new WebSocket.Server({ port });
 
 const clients = new Map();
-
+const m="first"
 server.on('connection', (socket) => {
     const clientId = Date.now().toString();
     clients.set(clientId, socket);
@@ -14,6 +14,7 @@ server.on('connection', (socket) => {
 
     socket.on('message', (message) => {
         console.log(`Received: ${message}`);
+        m=JSON.stringify( 'welcome'+ clientId +message)
     });
 
     socket.on('close', () => {
