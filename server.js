@@ -1,27 +1,43 @@
 const WebSocket = require('ws');
+
+// Set the port for the WebSocket server
 const port = process.env.PORT || 8080;
 
+// Create a new WebSocket server
 const server = new WebSocket.Server({ port });
 
-const clients = new Map();
-const m="first"
+// Keep track of connected clients
+const clients = new Set();
+
+console.log(`WebSocket server is running on ws://localhost:${port}`);
+
+// Handle new client connections
 server.on('connection', (socket) => {
-    const clientId = Date.now().toString();
-    clients.set(clientId, socket);
+    console.log('New client connected');
+    clients.add(socket);
 
-    console.log(`Client connected: ${clientId}`);
-    socket.send(JSON.stringify({ type: 'welcome', id: clientId }));
+    // Send a welcome message to the client
+    // socket.send(JSON.stringify({ type: 'welcome', message: 'Welcome to the WebSocket server!' }));
 
-    socket.on('message', (message) => {
-        console.log(`Received: ${message}`);
-        m=JSON.stringify( 'welcome'+ clientId +message)
+    // // Handle messages received from the client
+    // socket.on('message', (data) => {
+    //     console.log(`Received message: ${data}`);
+    //     // Broadcast the message to all connected clients
+    //     for (const client of clients) {
+    //         if (client !== socket && client.readyState === WebSocket.OPEN) {
+    //             client.send(data);
+    //         }
+    //     }
+    // });
+
+    // Handle client disconnections
+    socket.on('close', () => {
+        console.log('Client disconnected');
+        clients.delete(socket);
     });
 
-    socket.on('close', () => {
-        clients.delete(clientId);
-        console.log(`Client disconnected: ${clientId}`);
+    // Handle errors (optional)
+    socket.on('error', (error) => {
+        console.error(`WebSocket error: ${error.message}`);
     });
 });
-
-console.log(`WebSocket server running on port ${port}`);
-
