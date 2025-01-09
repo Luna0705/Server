@@ -22,6 +22,9 @@ def remove_player(room_name, player_name):
     else:
         print(f"{player_name} is not in {room_name}.")
 async def handle_connection(websocket):
+    if "upgrade" not in websocket.request_headers:
+        await websocket.close()
+        return
     print("New client connected")
     clients.add(websocket)
     try:
